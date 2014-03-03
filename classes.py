@@ -84,6 +84,10 @@ def balance_vectors(vectors):
 	l = Vector(0, 0)
 	l.magnitude = math.sqrt((total.x*total.x)+(total.y*total.y))
 	l.direction = math.atan2(total.y, total.x)
+	if (l.direction < 0.001):
+		l.direction = 0;
+	if (l.magnitude < 0.001):
+		l.magnitude = 0;
 	return l
 
 class Particle:
@@ -108,14 +112,26 @@ class Particle:
 		for i in range(0, len(self.tmp_forces)):
 			stri += "\nTMP Force:\n"+self.tmp_forces[i].to_string()
 		return stri
-	
+	def wait(self, time):
+		force = balance_vectors(self.forces)
+		forcer = balance_vectors(self.tmp_forces)
+		force = balance_vectors([force, forcer])
+		force.magnitude = force.magnitude * time
+		motion = balance_vectors([force, self.motion])
+		quop = self.motion.to_components()
+		self.position.x += quop.x
+		self.position.y += quop.y
+		self.tmp_forces = []
 
 
-vec = Vector(2, (math.pi/4))
+vec = Vector(2, (0))
 par = Particle([vec], Position(10, 5), [], "Mars", 10, Vector(2, 0))
 #print(par.to_string())
 
-vect = Vector(2, (math.pi*7/4))
+vect = Vector(2, (math.pi*5/4))
 
 l = balance_vectors([vec, vect])
 print(l.to_string())
+
+par.wait(1)
+print(par.to_string())
