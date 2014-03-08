@@ -1,5 +1,7 @@
 import math
 
+G = 6.67*pow(10, -11)
+
 def reduce_to(value, below):
 	while (value > below):
 		value = value - below
@@ -141,14 +143,30 @@ class Particle:
 		self.position.y += quop.y
 		self.tmp_forces = []
 
+	def to_csv(self):
+		return self.name+","+str(self.position.x)+","+str(self.position.y)
+
+	def reset(self):
+		self.tmp_forces = []
+		return
+
+	def get_grav(self, particle):
+		F = GM/r^2
+		mag = ((self.position.y - particle.position.y)*(self.position.y - particle.position.y)) + ((self.position.x - particle.position.x)*(self.position.x - particle.position.x))
+		force = (G*particle.mass)/mag
+		direction = (math.pi/2) - atan2(particle.position.y-self.position.y, particle.position.x-self.position.x)
+		return Vector(force, direction)
 
 vec = Vector(2, (0))
-par = Particle([Vector(2, 0), Vector(2, 0)], Position(10, 5), [], "Mars", 10, Vector(1,(math.pi/2)))
+par = Particle([Vector(20, 0), Vector(2, 0)], Position(10, 5), [], "Mars", 10, Vector(1,(math.pi/2)))
 #print(par.to_string())
 
 vect = Vector(2, (math.pi*5/4))
 
 
-print(par.to_string())
-par.wait(2)
-print(par.to_string())
+
+print("Name\tX\tY")
+
+for i in range (0, 100):
+	print(par.to_csv())
+	par.wait(1)
