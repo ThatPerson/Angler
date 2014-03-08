@@ -83,10 +83,22 @@ def balance_vectors(vectors):
 		total.y += po.y
 	l = Vector(0, 0)
 	l.magnitude = math.sqrt((total.x*total.x)+(total.y*total.y))
-	if (total.x == 0):
+	if (total.x == 0 and total.y >= 0):
 		l.direction = 0
+	elif (total.y < 0):
+		l.direction = math.pi
 	else:
 		l.direction = math.atan(total.y/total.x)
+
+	if (total.x >= 0 and total.y >= 0):
+		total.x = total.x
+	elif (total.x >= 0 and total.y < 0):
+		l.direction = total.direction + (math.pi)/2
+	elif (total.x < 0 and total.y < 0):
+		l.direction = total.direction + (math.pi)
+	elif (total.x < 0 and total.y >= 0):
+		l.direction = total.direction + (math.pi) + (math.pi/2)
+
 	if (l.direction < 0.001):
 		l.direction = 0;
 	if (l.magnitude < 0.001):
@@ -131,7 +143,7 @@ class Particle:
 
 
 vec = Vector(2, (0))
-par = Particle([Vector(2, 0), Vector(2, 0)], Position(10, 5), [], "Mars", 10, Vector(1,0))
+par = Particle([Vector(2, 0), Vector(2, 0)], Position(10, 5), [], "Mars", 10, Vector(1,(math.pi/2)))
 #print(par.to_string())
 
 vect = Vector(2, (math.pi*5/4))
