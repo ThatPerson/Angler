@@ -71,7 +71,7 @@ class Vector:
 			y = -(self.magnitude * math.cos(angle_l))
 		elif (angle >= (3*(math.pi*2)/4)):
 			x = -(self.magnitude * math.cos(angle_l))
-			y = self.magnutide * math.sin(angle_l)
+			y = self.magnitude * math.sin(angle_l)
 		
 		return Position(x, y)		
 
@@ -95,11 +95,11 @@ def balance_vectors(vectors):
 	if (total.x >= 0 and total.y >= 0):
 		total.x = total.x
 	elif (total.x >= 0 and total.y < 0):
-		l.direction = total.direction + (math.pi)/2
+		l.direction = l.direction + (math.pi)/2
 	elif (total.x < 0 and total.y < 0):
-		l.direction = total.direction + (math.pi)
+		l.direction = l.direction + (math.pi)
 	elif (total.x < 0 and total.y >= 0):
-		l.direction = total.direction + (math.pi) + (math.pi/2)
+		l.direction = l.direction + (math.pi) + (math.pi/2)
 
 	if (l.direction < 0.001):
 		l.direction = 0;
@@ -132,8 +132,8 @@ class Particle:
 
 	def wait(self, time):
 		force = balance_vectors(self.forces)
-		#forcer = balance_vectors(self.tmp_forces)
-		#force = balance_vectors([force, forcer])
+		forcer = balance_vectors(self.tmp_forces)
+		force = balance_vectors([force, forcer])
 
 		force.magnitude = force.magnitude * time
 		self.motion = balance_vectors([force, self.motion])
@@ -151,22 +151,22 @@ class Particle:
 		return
 
 	def get_grav(self, particle):
-		F = GM/r^2
 		mag = ((self.position.y - particle.position.y)*(self.position.y - particle.position.y)) + ((self.position.x - particle.position.x)*(self.position.x - particle.position.x))
 		force = (G*particle.mass)/mag
-		direction = (math.pi/2) - atan2(particle.position.y-self.position.y, particle.position.x-self.position.x)
+		direction = (math.pi/2) - math.atan2(particle.position.y-self.position.y, particle.position.x-self.position.x)
 		return Vector(force, direction)
 
 vec = Vector(2, (0))
-par = Particle([Vector(20, 0), Vector(2, 0)], Position(10, 5), [], "Mars", 10, Vector(1,(math.pi/2)))
-#print(par.to_string())
-
-vect = Vector(2, (math.pi*5/4))
-
-
+par = [Particle([], Position(10, 5), [], "Mars", 10, Vector(0,0)), Particle([], Position (500, 500), [], "Earth", 24*pow(10, 24), Vector(0, 0))]
 
 print("Name\tX\tY")
 
 for i in range (0, 100):
-	print(par.to_csv())
-	par.wait(1)
+	for p in range(0, 2):
+		print(par[p].to_csv())
+		for q in range (0, 2):
+			if (p != q):
+				par[p].tmp_forces.append(par[p].get_grav(par[q]))
+		par[p].wait(1)
+		par[p].reset()
+
