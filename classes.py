@@ -49,8 +49,8 @@ class Vector:
 		return "Mag: "+str(self.magnitude)+"\nAngle: "+str(self.direction)
 
 	def to_components(self):
-		angle = reduce_to(self.direction, 360)
-		angle_l = reduce_to(self.direction, 90)
+		angle = reduce_to(self.direction, (math.pi*2))
+		angle_l = reduce_to(self.direction, (math.pi*2)/4)
 		
 		x = 0
 		y = 0
@@ -58,32 +58,35 @@ class Vector:
 		if (angle < 0):
 			angle = angle + 360
 		
-		if (angle >= 0 and angle <= 90):
+		if (angle >= 0 and angle <= (math.pi*2)/4):
 			x = self.magnitude * math.sin(angle_l)
 			y = self.magnitude * math.cos(angle_l)
-		elif (angle >= 90 and angle <= 180):
+		elif (angle >= (math.pi*2)/4 and angle <= (math.pi*2)/2):
 			x = self.magnitude * math.cos(angle_l)
 			y = -(self.magnitude * math.sin(angle_l))
-		elif (angle >= 180 and angle <= 270):
+		elif (angle >= (math.pi*2)/2 and angle <= (3*(math.pi*2)/4)):
 			x = -(self.magnitude * math.sin(angle_l))
 			y = -(self.magnitude * math.cos(angle_l))
-		elif (angle >= 270):
+		elif (angle >= (3*(math.pi*2)/4)):
 			x = -(self.magnitude * math.cos(angle_l))
 			y = self.magnutide * math.sin(angle_l)
 		
 		return Position(x, y)		
 
 def balance_vectors(vectors):
+	
 	total = Position(0, 0)
 	po = Position(0, 0)
 	for i in range(0, len(vectors)):
 		po = vectors[i].to_components()
-		print(po.to_string())
 		total.x += po.x
 		total.y += po.y
 	l = Vector(0, 0)
 	l.magnitude = math.sqrt((total.x*total.x)+(total.y*total.y))
-	l.direction = math.atan2(total.y, total.x)
+	if (total.x == 0):
+		l.direction = 0
+	else:
+		l.direction = math.atan(total.y/total.x)
 	if (l.direction < 0.001):
 		l.direction = 0;
 	if (l.magnitude < 0.001):
@@ -112,12 +115,15 @@ class Particle:
 		for i in range(0, len(self.tmp_forces)):
 			stri += "\nTMP Force:\n"+self.tmp_forces[i].to_string()
 		return stri
+
 	def wait(self, time):
 		force = balance_vectors(self.forces)
-		forcer = balance_vectors(self.tmp_forces)
-		force = balance_vectors([force, forcer])
+		#forcer = balance_vectors(self.tmp_forces)
+		#force = balance_vectors([force, forcer])
+
 		force.magnitude = force.magnitude * time
-		motion = balance_vectors([force, self.motion])
+		self.motion = balance_vectors([force, self.motion])
+
 		quop = self.motion.to_components()
 		self.position.x += quop.x
 		self.position.y += quop.y
@@ -125,13 +131,12 @@ class Particle:
 
 
 vec = Vector(2, (0))
-par = Particle([vec], Position(10, 5), [], "Mars", 10, Vector(2, 0))
+par = Particle([Vector(2, 0), Vector(2, 0)], Position(10, 5), [], "Mars", 10, Vector(1,0))
 #print(par.to_string())
 
 vect = Vector(2, (math.pi*5/4))
 
-l = balance_vectors([vec, vect])
-print(l.to_string())
 
-par.wait(1)
+print(par.to_string())
+par.wait(2)
 print(par.to_string())
